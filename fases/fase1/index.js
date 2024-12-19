@@ -1,11 +1,12 @@
 import * as monaco from 'https://cdn.jsdelivr.net/npm/monaco-editor@0.50.0/+esm';
 import { parse } from './parser/gramatica.js';
 import { ErrorReglas } from './parser/error.js';
-
+import {Generator } from './parser/generateTemplate.js'
 
 export let ids = []
 export let usos = []
 export let errores = []
+
 
 
 // Crear el editor principal
@@ -46,6 +47,9 @@ const analizar = () => {
             return
         }else{
             salida.setValue("Análisis Exitoso");
+            //aqui va generado el archivo de salida
+            //const generator = new Generator();
+            //generator.generateplantilla();
         }
 
         // salida.setValue("Análisis Exitoso");
