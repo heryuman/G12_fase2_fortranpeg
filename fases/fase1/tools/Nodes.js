@@ -4,7 +4,9 @@ const nodes = {
     Union: ['exprs'],
     Expresion: ['expr', 'label', 'qty'],
     String: ['val', 'isCase'],
-    // seguir
+    Clase:['chars', 'isCase'],
+    Rango: ['bottom', 'top'],
+    Etiqueta:['id',"dp","varios","arroba"],
 };
 
 export default nodes;
