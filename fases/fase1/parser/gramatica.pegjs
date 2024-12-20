@@ -23,7 +23,7 @@ gramatica = _ producciones+ _ {
     }
 }
 
-producciones = _ id:identificador _ (literales)? _ "=" _ opciones (_";")? { ids.push(id) }
+producciones = _ id:identificador _ alias:(literales)? _ "=" _ expr:opciones (_";")? { ids.push(id) }
 
 opciones = union (_ "/" _ union)*
 

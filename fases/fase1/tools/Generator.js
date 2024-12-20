@@ -6,8 +6,8 @@ import path from 'node:path';
 import nodes from './Nodes.js';
 
 const __dirname = import.meta.dirname;
-const classesDestination = '../src/AST.ts';
-const visitorDestination = '../src/Interfaces/Visitor.ts';
+const classesDestination = '../visitor/AST.js';
+const visitorDestination = '../visitor/Visitor.js';
 
 let codeString = `
 // Auto-generated
@@ -17,7 +17,7 @@ export default class Visitor {
 
 `;
 for (const node of Object.keys(nodes)) {
-    codeString += `\tvisit${node}(node: Node): T\n`;
+    codeString += `\tvisit${node}(node) {}\n`;
 }
 codeString += `}`;
 
@@ -26,20 +26,16 @@ console.log('Generated visitor Interface');
 
 codeString = `
 // Auto-generated
-import Node from './Interfaces/Node.js';
-import Visitor from './Interfaces/Visitor.js';
+import Node from './Node.js';
 `;
 for (const [name, args] of Object.entries(nodes)) {
-    const argKeys = Object.keys(args);
     codeString += `
-export class ${name} implements Node {
-    ${argKeys.map((arg) => `${arg}: ${args[arg]};`).join('\n\t')}
-
-    constructor(${argKeys.map((arg) => `${arg}: ${args[arg]}`).join(', ')}) {
-        ${argKeys.map((arg) => `this.${arg} = ${arg};`).join('\n\t\t')}
+export class ${name} extends Node {
+    constructor(${args.join(', ')}) {
+        ${args.map((arg) => `this.${arg} = ${arg};`).join('\n\t\t')}
     }
 
-    accept<T>(visitor: Visitor<T>) {
+    accept(visitor){
         return visitor.visit${name}(this);
     }
 }
