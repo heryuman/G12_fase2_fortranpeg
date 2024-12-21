@@ -45,20 +45,14 @@ union
 
 expresion
   = label:$(etiqueta/varios)? _ expr:expresiones _ qty:$([?+*]/conteo)? {
-    console.log("Expresion: ");
+    console.log("---Expresion: -----------------");
+    console.log("label: ", label);
+    console.log("expr: ", expr);
+    console.log("qty: ", qty);
     return new n.Expresion(expr, label, qty);
   }
 
-etiqueta = arroba:("@")? _ id:identificador _ dp:":" varios:$(varios)?{
-    usos.push(id)
-    ids.push(id);
-    console.log("--Etiqueta--", arroba, id, dp, varios);
-    console.log("id: ", id);
-    console.log("dp: ", dp);
-    console.log("varios: ", varios);
-    console.log("arroba: ", arroba);
-    return new n.Etiqueta(id,dp,varios,arroba);
-}
+etiqueta = arroba:("@")? _ id:identificador _ dp:":" varios:$(varios)?
 
 varios = ("!"/"$"/"@"/"&")
 
