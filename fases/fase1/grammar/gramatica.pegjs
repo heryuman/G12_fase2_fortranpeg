@@ -32,29 +32,20 @@ producciones
     return new n.Producciones(id, expr, alias);
   }
 
-opciones
-  = expr:union rest:(_ "/" _ @union)* {
-    console.log("Opciones: ", expr, rest);
-    return new n.Opciones([expr, ...rest]);
-  }
+opciones = union (_ "/" _ union)*
 
-union
-  = expr:expresion rest:(_ @expresion !(_ literales? _ "=") )* {
-    return new n.Union([expr, ...rest]);
-  }
+union = expresion (_ expresion !(_ literales? _ "=") )*
 
-expresion
-  = label:$(etiqueta/varios)? _ expr:expresiones _ qty:$([?+*]/conteo)? {
-    console.log("---Expresion: -----------------");
-    console.log("label: ", label);
-    console.log("expr: ", expr);
-    console.log("qty: ", qty);
-    return new n.Expresion(expr, label, qty);
-  }
+expresion = ("@")? _ id:(identificador _ ":")?_ varios? _ expresiones _ ([?+*]/conteo)?
 
-etiqueta = arroba:("@")? _ id:identificador _ dp:":" varios:$(varios)?
+//ERRORES ENCONTRADOS: podia venir @pluck:@"expresion"  o 
+/*expresion  = (etiqueta/varios)? _ expresiones _ ([?+*]/conteo)?
 
-varios = ("!"/"$"/"@"/"&")
+etiqueta = ("@")? _ id:identificador _ ":" (varios)?
+
+ varios = ("!"/"$"/"@"/"&")*/
+
+varios = ("!"/"&"/"$")
 
 expresiones
   = id:identificador {
@@ -84,26 +75,59 @@ conteo = "|" _ (numero / id:identificador) _ "|"
 // delimitador =  "," _ expresion
 
 // Regla principal que analiza corchetes con contenido
-clase
-  = "[" @contenidoClase+ "]"
+corchetes
+    = "[" contenido:(rango / texto)+ "]" {
+        return `Entrada válida: [${input}]`;
+    }
 
-contenidoClase
-  = bottom:$[^\[\]] "-" top:$[^\[\]] {
-    return new n.Rango(bottom, top);
+// Regla para validar un rango como [A-Z]
+rango
+    = inicio:caracter "-" fin:caracter {
+        if (inicio.charCodeAt(0) > fin.charCodeAt(0)) {
+            throw new Error(`Rango inválido: [${inicio}-${fin}]`);
+
+        }
+        return `${inicio}-${fin}`;//se debe crear la lista
+    }
+
+// Regla para caracteres individuales
+caracter
+    = [a-zA-Z0-9_ ] { return text()}
+
+
+
+/* GRAMATICAS ANTERIORES, DAN ERROR AL TRATAR DE RECONOCER EJ: [abc0-3], reconocimiento esperado: [a,b,c,1,2,3]
+                                                                  Salida que se obtiene: [a,b,c,1,-,3]
+
+ contenido
+   = elementos:(corchete / texto)+ {
+      return new n.Contenido(elementos);
   }
-  / $[^\[\]]
 
-literales
-  = '"' @stringDobleComilla* '"'
-  / "'" @stringSimpleComilla* "'"
+ corchete
+    = "[" contenido "]" 
+*/
+
+// Coincide con cualquier contenido que no incluya "]"
+
+texto
+    = [^\[\]]
+
+literales = '"' stringDobleComilla* '"'
+            / "'" stringSimpleComilla* "'"
 
 stringDobleComilla = !('"' / "\\" / finLinea) .
                     / "\\" escape
-                    / continuacionLinea
+                    //(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
+                    // / continuacionLinea
 
 stringSimpleComilla = !("'" / "\\" / finLinea) .
                     / "\\" escape
-                    / continuacionLinea
+                    //(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
+                    // / continuacionLinea
+
+//(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
+// continuacionLinea = "\\" secuenciaFinLinea
 
 continuacionLinea = "\\" secuenciaFinLinea
 
