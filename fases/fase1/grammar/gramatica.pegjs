@@ -7,12 +7,11 @@
     import { ids, usos} from '../index.js'
     import { ErrorReglas } from './error.js';
     import { errores } from '../index.js'
-
     import * as n from '../visitor/CST.js';
 }}
 
-gramatica
-  = _ prods:producciones+ _ {
+gramatica = _ prods:producciones+ _ {
+
     let duplicados = ids.filter((item, index) => ids.indexOf(item) !== index);
     if (duplicados.length > 0) {
         errores.push(new ErrorReglas("Regla duplicada: " + duplicados[0]));
@@ -23,18 +22,23 @@ gramatica
     if (noEncontrados.length > 0) {
         errores.push(new ErrorReglas("Regla no encontrada: " + noEncontrados[0]));
     }
+
     return prods;
+}
+
+producciones = _ id:identificador _ (literales)? _ "=" _ expr: opciones (_";")? { 
+  ids.push(id) 
+  return new n.Producciones(id,expr,alias);
   }
 
-producciones
-  = _ id:identificador _ alias:(literales)? _ "=" _ expr:opciones (_";")? {
-    ids.push(id);
-    return new n.Producciones(id, expr, alias);
-  }
+opciones = expr:union rest:(_ "/" _ union)*{
+ return new n.Opciones([expr, ...rest]);
 
-opciones = union (_ "/" _ union)*
+}
 
-union = expresion (_ expresion !(_ literales? _ "=") )*
+union = expr: expresion rest:(_ expresion !(_ literales? _ "=") )*{
+  return new n.Union([expr, ...rest]);
+}
 
 expresion = ("@")? _ id:(identificador _ ":")?_ varios? _ expresiones _ ([?+*]/conteo)?
 
@@ -47,19 +51,16 @@ etiqueta = ("@")? _ id:identificador _ ":" (varios)?
 
 varios = ("!"/"&"/"$")
 
-expresiones
-  = id:identificador {
-    usos.push(id)
+expresiones  =  id:identificador { usos.push(id)
+
+ }
+                / val:$literales isCase:"i"?{
+                return new n.String(val.replace(/['"]/g, ''), isCase);
   }
-  / val:$literales isCase:"i"? {
-    return new n.String(val.replace(/['"]/g, ''), isCase);
-  }
-  / "(" _ opciones _ ")"
-  / chars:clase isCase:"i"? {
-    return new n.Clase(chars, isCase)
-  }
-  / "."
-  / "!."
+                / "(" _ opciones _ ")"
+                / corchetes "i"?
+                / "."
+                / "!."
 
 // conteo = "|" parteconteo _ (_ delimitador )? _ "|"
 
@@ -87,7 +88,8 @@ rango
             throw new Error(`Rango inválido: [${inicio}-${fin}]`);
 
         }
-        return `${inicio}-${fin}`;//se debe crear la lista
+        //return `${inicio}-${fin}`;//se debe crear la lista
+        return new n.Rango(inicio, fin);
     }
 
 // Regla para caracteres individuales
