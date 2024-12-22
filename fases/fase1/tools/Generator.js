@@ -25,7 +25,6 @@ codeString = `
 // Auto-generated
 import Node from './Node.js';
 `;
-
 for (const [name, args] of Object.entries(nodes)) {
     codeString += `
 export class ${name} extends Node {

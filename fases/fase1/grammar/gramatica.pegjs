@@ -22,32 +22,41 @@ gramatica = _ prods:producciones+ _ {
     if (noEncontrados.length > 0) {
         errores.push(new ErrorReglas("Regla no encontrada: " + noEncontrados[0]));
     }
+
     return prods;
 }
 
-producciones = _ id:identificador _ alias:(literales)? _ "=" _ expr:opciones (_";")? { 
-    ids.push(id) 
-    return new n.Producciones(id, expr, alias);
-    }
+producciones = _ id:identificador _ (literales)? _ "=" _ expr: opciones (_";")? { 
+  ids.push(id) 
+  return new n.Producciones(id,expr,alias);
+  }
 
-opciones = expr:union rest:(_ "/" _ @union)* {
-    return new n.Opciones([expr, ...rest]);
+opciones = expr:union rest:(_ "/" _ union)*{
+ return new n.Opciones([expr, ...rest]);
+
 }
 
-union = expr:expresion rest:(_ @expresion !(_ literales? _ "=") )* {
-    return new n.Union([expr, ...rest]);
+union = expr: expresion rest:(_ expresion !(_ literales? _ "=") )*{
+  return new n.Union([expr, ...rest]);
 }
 
-expresion  = label:$(etiqueta/varios)? _ expr:expresiones _ qty:$([?+*]/conteo)? {
-    return new n.Expresion(expr, label, qty);
-}
+expresion = ("@")? _ id:(identificador _ ":")?_ varios? _ expresiones _ ([?+*]/conteo)?
+
+//ERRORES ENCONTRADOS: podia venir @pluck:@"expresion"  o 
+/*expresion  = (etiqueta/varios)? _ expresiones _ ([?+*]/conteo)?
 
 etiqueta = ("@")? _ id:identificador _ ":" (varios)?
 
-varios = ("!"/"$"/"@"/"&")
+ varios = ("!"/"$"/"@"/"&")*/
 
-expresiones  =  id:identificador { usos.push(id) }
-                / val:$literales isCase:"i"? {return new n.String(val.replace(/['"]/g, ''), isCase);}
+varios = ("!"/"&"/"$")
+
+expresiones  =  id:identificador { usos.push(id)
+
+ }
+                / val:$literales isCase:"i"?{
+                return new n.String(val.replace(/['"]/g, ''), isCase);
+  }
                 / "(" _ opciones _ ")"
                 / corchetes "i"?
                 / "."
@@ -68,7 +77,7 @@ conteo = "|" _ (numero / id:identificador) _ "|"
 
 // Regla principal que analiza corchetes con contenido
 corchetes
-    = "[" contenido:(rango / contenido)+ "]" {
+    = "[" contenido:(rango / texto)+ "]" {
         return `Entrada válida: [${input}]`;
     }
 
@@ -79,33 +88,48 @@ rango
             throw new Error(`Rango inválido: [${inicio}-${fin}]`);
 
         }
-        return `${inicio}-${fin}`;
+        //return `${inicio}-${fin}`;//se debe crear la lista
+        return new n.Rango(inicio, fin);
     }
 
 // Regla para caracteres individuales
 caracter
     = [a-zA-Z0-9_ ] { return text()}
 
-// Coincide con cualquier contenido que no incluya "]"
-contenido
-    = (corchete / texto)+
 
-corchete
-    = "[" contenido "]"
+
+/* GRAMATICAS ANTERIORES, DAN ERROR AL TRATAR DE RECONOCER EJ: [abc0-3], reconocimiento esperado: [a,b,c,1,2,3]
+                                                                  Salida que se obtiene: [a,b,c,1,-,3]
+
+ contenido
+   = elementos:(corchete / texto)+ {
+      return new n.Contenido(elementos);
+  }
+
+ corchete
+    = "[" contenido "]" 
+*/
+
+// Coincide con cualquier contenido que no incluya "]"
 
 texto
-    = [^\[\]]+
+    = [^\[\]]
 
-literales = '"'  @stringDobleComilla* '"'
-            / "'" @stringSimpleComilla* "'" 
+literales = '"' stringDobleComilla* '"'
+            / "'" stringSimpleComilla* "'"
 
 stringDobleComilla = !('"' / "\\" / finLinea) .
                     / "\\" escape
-                    / continuacionLinea
+                    //(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
+                    // / continuacionLinea
 
 stringSimpleComilla = !("'" / "\\" / finLinea) .
                     / "\\" escape
-                    / continuacionLinea
+                    //(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
+                    // / continuacionLinea
+
+//(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
+// continuacionLinea = "\\" secuenciaFinLinea
 
 continuacionLinea = "\\" secuenciaFinLinea
 
