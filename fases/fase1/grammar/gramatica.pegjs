@@ -17,48 +17,38 @@ gramatica = _ prods:producciones+ _ {
         errores.push(new ErrorReglas("Regla duplicada: " + duplicados[0]));
     }
 
+
     // Validar que todos los usos están en ids
     let noEncontrados = usos.filter(item => !ids.includes(item));
     if (noEncontrados.length > 0) {
         errores.push(new ErrorReglas("Regla no encontrada: " + noEncontrados[0]));
     }
-
     return prods;
 }
 
-producciones = _ id:identificador _ (literales)? _ "=" _ expr: opciones (_";")? { 
-  ids.push(id) 
-  return new n.Producciones(id,expr,alias);
-  }
-
-opciones = expr:union rest:(_ "/" _ union)*{
- return new n.Opciones([expr, ...rest]);
-
+producciones = _ id:identificador _ alias:(literales)? _ "=" _ expr:opciones (_";")? { 
+    ids.push(id) 
+    return new n.Producciones(id, expr, alias);
 }
 
-union = expr: expresion rest:(_ expresion !(_ literales? _ "=") )*{
-  return new n.Union([expr, ...rest]);
+opciones = expr:union rest:(_ "/" _ @union)* {
+    return new n.Opciones([expr, ...rest]);
 }
 
-expresion = ("@")? _ id:(identificador _ ":")?_ varios? _ expresiones _ ([?+*]/conteo)?
+union = expr:expresion rest:(_ @expresion !(_ literales? _ "=") )* {
+    return new n.Union([expr, ...rest]);
+}
 
-//ERRORES ENCONTRADOS: podia venir @pluck:@"expresion"  o 
-/*expresion  = (etiqueta/varios)? _ expresiones _ ([?+*]/conteo)?
+expresion = prefix:("@")? _ label:$(identificador _ ":")?_ operator:varios? _ expr:expresiones _ qty:$([?+*]/conteo)? {
+    return new n.Expresion(expr,prefix,label, operator, qty);
+}
 
-etiqueta = ("@")? _ id:identificador _ ":" (varios)?
+varios = ("!"/"&"/"$") 
 
- varios = ("!"/"$"/"@"/"&")*/
-
-varios = ("!"/"&"/"$")
-
-expresiones  =  id:identificador { usos.push(id)
-
- }
-                / val:$literales isCase:"i"?{
-                return new n.String(val.replace(/['"]/g, ''), isCase);
-  }
+expresiones  =  id:identificador { usos.push(id) }
+                / val:$literales isCase:"i"?  {return new n.String(val.replace(/['"]/g, ''), isCase);}
                 / "(" _ opciones _ ")"
-                / corchetes "i"?
+                / chars:corchetes isCase:"i"? {return new n.Corchete(chars, isCase)}
                 / "."
                 / "!."
 
@@ -88,52 +78,34 @@ rango
             throw new Error(`Rango inválido: [${inicio}-${fin}]`);
 
         }
-        //return `${inicio}-${fin}`;//se debe crear la lista
-        return new n.Rango(inicio, fin);
+        return `${inicio}-${fin}`;
     }
 
 // Regla para caracteres individuales
 caracter
     = [a-zA-Z0-9_ ] { return text()}
 
-
-
-/* GRAMATICAS ANTERIORES, DAN ERROR AL TRATAR DE RECONOCER EJ: [abc0-3], reconocimiento esperado: [a,b,c,1,2,3]
-                                                                  Salida que se obtiene: [a,b,c,1,-,3]
-
- contenido
-   = elementos:(corchete / texto)+ {
-      return new n.Contenido(elementos);
-  }
-
- corchete
-    = "[" contenido "]" 
-*/
-
 // Coincide con cualquier contenido que no incluya "]"
+/*corchete
+    = "[" contenido "]" */
 
 texto
-    = [^\[\]]
+    = [^\[\]]+
 
-literales = '"' stringDobleComilla* '"'
-            / "'" stringSimpleComilla* "'"
+literales = '"'  @stringDobleComilla* '"'
+            / "'" @stringSimpleComilla* "'" 
 
 stringDobleComilla = !('"' / "\\" / finLinea) .
                     / "\\" escape
-                    //(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
-                    // / continuacionLinea
+                    / continuacionLinea
 
 stringSimpleComilla = !("'" / "\\" / finLinea) .
                     / "\\" escape
-                    //(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
-                    // / continuacionLinea
-
-//(se quitaron porque peggyjs no acepta cadenas con multilinea) igual no funcionaba xd
-// continuacionLinea = "\\" secuenciaFinLinea
+                    / continuacionLinea
 
 continuacionLinea = "\\" secuenciaFinLinea
 
-finLinea = [\n\r\u2028\u2029]
+finLinea = [\n\r\u2028\u2029] 
 
 escape = "'"
         / '"'
@@ -153,7 +125,7 @@ secuenciaFinLinea = "\r\n" / "\n" / "\r" / "\u2028" / "\u2029"
 //     / "'" [^']* "'"
     
 
-numero = [0-9]+
+numero = [0-9]+ {return new n.Numero()}
 
 identificador = [_a-z]i[_a-z0-9]i* { return text() }
 

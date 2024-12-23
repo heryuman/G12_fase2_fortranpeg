@@ -1,5 +1,4 @@
 import Visitor from './Visitor.js';
-import { Rango } from './CST.js';
 
 export default class Tokenizer extends Visitor {
     generateTokenizer(grammar) {
@@ -32,62 +31,26 @@ end module tokenizer
     visitProducciones(node) {
         return node.expr.accept(this);
     }
+
     visitOpciones(node) {
-        return node.exprs.map((node) => node.accept(this)).join('\n');
+        return node.exprs[0].accept(this);
     }
     visitUnion(node) {
-        return node.exprs.map((node) => node.accept(this)).join('\n');
+        return node.exprs[0].accept(this);
     }
     visitExpresion(node) {
         return node.expr.accept(this);
     }
     visitString(node) {
         return `
-    if ("${node.val}" == input(cursor:cursor + ${node.val.length - 1})) then
+    if ("${node.val}" == input(cursor:cursor + ${
+            node.val.length - 1
+        })) then !Foo
         allocate( character(len=${node.val.length}) :: lexeme)
         lexeme = input(cursor:cursor + ${node.val.length - 1})
         cursor = cursor + ${node.val.length}
         return
     end if
     `;
-    }
-
-    generateCaracteres(chars) {
-        if (chars.length === 0) return '';
-        return `
-    if (findloc([${chars
-        .map((char) => `"${char}"`)
-        .join(', ')}], input(i:i), 1) > 0) then
-        lexeme = input(cursor:i)
-        cursor = i + 1
-        return
-    end if
-        `;
-    }
-
-    visitClase(node) {
-        return `
-    i = cursor
-    ${this.generateCaracteres(
-        node.chars.filter((node) => typeof node === 'string')
-    )}
-    ${node.chars
-        .filter((node) => node instanceof Rango)
-        .map((range) => range.accept(this))
-        .join('\n')}
-        `;
-    }
-
-    visitRango(node) {
-        return `
-    if (input(i:i) >= "${node.bottom}" .and. input(i:i) <= "${node.top}") then
-        lexeme = input(cursor:i)
-        cursor = i + 1
-        return
-    end if
-        `;
-    }
-    visitEtiqueta(node) {
-        return `algo en la etiqueta`;
     }
 }

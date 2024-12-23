@@ -6,7 +6,6 @@ export default class Visitor {
 	visitUnion(node) {}
 	visitExpresion(node) {}
 	visitString(node) {}
-	visitClase(node) {}
+	visitCorchete(node) {}
 	visitRango(node) {}
-	visitEtiqueta(node) {}
 }

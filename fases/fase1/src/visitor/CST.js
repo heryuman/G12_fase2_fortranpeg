@@ -38,10 +38,12 @@ export class Union extends Node {
 }
     
 export class Expresion extends Node {
-    constructor(expr, label, qty) {
+    constructor(expr, prefix, label, operator, qty) {
         super();
         this.expr = expr;
+		this.prefix = prefix;
 		this.label = label;
+		this.operator = operator;
 		this.qty = qty;
     }
 
@@ -62,7 +64,7 @@ export class String extends Node {
     }
 }
     
-export class Clase extends Node {
+export class Corchete extends Node {
     constructor(chars, isCase) {
         super();
         this.chars = chars;
@@ -70,7 +72,7 @@ export class Clase extends Node {
     }
 
     accept(visitor) {
-        return visitor.visitClase(this);
+        return visitor.visitCorchete(this);
     }
 }
     
@@ -83,20 +85,6 @@ export class Rango extends Node {
 
     accept(visitor) {
         return visitor.visitRango(this);
-    }
-}
-    
-export class Etiqueta extends Node {
-    constructor(id, dp, varios, arroba) {
-        super();
-        this.id = id;
-		this.dp = dp;
-		this.varios = varios;
-		this.arroba = arroba;
-    }
-
-    accept(visitor) {
-        return visitor.visitEtiqueta(this);
     }
 }
     
