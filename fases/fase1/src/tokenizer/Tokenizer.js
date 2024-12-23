@@ -12,14 +12,28 @@ contains
 subroutine parse(input)
     character(len=*), intent(in) :: input
     character(len=20) :: lexeme
-    integer :: cursor
+    integer :: cursor, line_start, line_end
 
     cursor = 1
     lexeme = " "
 
-    do while (lexeme /= "EOF" .and. lexeme /= "ERROR")
-        lexeme = nextSym(input, cursor)
-        print *, "Lexeme: ", lexeme
+    do while (cursor <= len(input))
+        line_start = cursor
+        line_end = index(input(cursor:), char(10)) 
+        
+        if (line_end < 0) then
+            line_end = len(input) - cursor + 1
+        else
+            line_end = line_end - 1
+        end if
+        ! .and. cursor <= (line_start + line_end)
+        do while (lexeme /= "EOF" .and. lexeme /= "ERROR")
+            lexeme = nextSym(input, cursor) 
+            print *,lexeme
+            if (lexeme == "EOF" .or. lexeme == "ERROR") exit
+        end do
+
+        cursor = line_start + line_end + 1
     end do
 end subroutine parse
 
@@ -32,6 +46,13 @@ function nextSym(input, cursor) result(lexeme)
     if (cursor > len(input)) then
         allocate( character(len=3) :: lexeme )
         lexeme = "EOF"
+        return
+    end if
+
+    if (input(cursor:cursor) == char(10)) then
+        allocate(character(len=1) :: lexeme)
+        lexeme = char(10)
+        cursor = cursor + 1
         return
     end if
 
