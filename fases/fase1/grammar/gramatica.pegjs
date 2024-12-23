@@ -48,7 +48,9 @@ varios = ("!"/"&"/"$")
 expresiones  =  id:identificador { usos.push(id) }
                 / val:$literales isCase:"i"?  {return new n.String(val.replace(/['"]/g, ''), isCase);}
                 / "(" _ opciones _ ")"
-                / chars:corchetes isCase:"i"? {return new n.Corchete(chars, isCase)}
+                / chars:corchetes isCase:"i"? {
+                    console.log("chars--->> ",chars.flat());
+                    return new n.Corchete(chars.flat(), isCase)}
                 / "."
                 / "!."
 
@@ -67,9 +69,15 @@ conteo = "|" _ (numero / id:identificador) _ "|"
 
 // Regla principal que analiza corchetes con contenido
 corchetes
-    = "[" contenido:(rango / texto)+ "]" {
-        return `Entrada válida: [${input}]`;
-    }
+    = "[" contenido:(@rango / @texto)+ "]" {
+        //console.log("corchetes--->> ",contenido);
+       console.log(`Entrada válida: ${contenido}`);
+        //return `Entrada válida: [${input}]`;
+      // return new n.Corchete(contenido);
+     return contenido;
+     
+     //return contenido;
+   }
 
 // Regla para validar un rango como [A-Z]
 rango
@@ -78,7 +86,8 @@ rango
             throw new Error(`Rango inválido: [${inicio}-${fin}]`);
 
         }
-        return `${inicio}-${fin}`;
+        //return `${inicio}-${fin}`;
+        return new n.Rango(inicio, fin);
     }
 
 // Regla para caracteres individuales
