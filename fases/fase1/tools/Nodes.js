@@ -7,7 +7,9 @@ const nodes = {
     String: ['val', 'isCase'],
     Corchete: ['chars', 'isCase'],
     Rango: ['bottom', 'top'],
-
+    Identificador: ['string'],
+    Punto: [],
+    Fin: [],
     // seguir
 };
 
