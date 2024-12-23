@@ -88,3 +88,36 @@ export class Rango extends Node {
     }
 }
     
+export class Identificador extends Node {
+    constructor(string) {
+        super();
+        this.string = string;
+    }
+
+    accept(visitor) {
+        return visitor.visitIdentificador(this);
+    }
+}
+    
+export class Punto extends Node {
+    constructor() {
+        super();
+        
+    }
+
+    accept(visitor) {
+        return visitor.visitPunto(this);
+    }
+}
+    
+export class Fin extends Node {
+    constructor() {
+        super();
+        
+    }
+
+    accept(visitor) {
+        return visitor.visitFin(this);
+    }
+}
+    

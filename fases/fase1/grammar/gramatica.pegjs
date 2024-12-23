@@ -45,14 +45,16 @@ expresion = prefix:("@")? _ label:$(identificador _ ":")?_ operator:varios? _ ex
 
 varios = ("!"/"&"/"$") 
 
-expresiones  =  id:identificador { usos.push(id) }
+expresiones  =  id:identificador { usos.push(id)
+                    return new n.Identificador(id);
+                }
                 / val:$literales isCase:"i"?  {return new n.String(val.replace(/['"]/g, ''), isCase);}
                 / "(" _ opciones _ ")"
                 / chars:corchetes isCase:"i"? {
                     console.log("chars--->> ",chars.flat());
                     return new n.Corchete(chars.flat(), isCase)}
-                / "."
-                / "!."
+                / "."  {return new n.Punto();}
+                / "!." {return new n.Fin();}
 
 // conteo = "|" parteconteo _ (_ delimitador )? _ "|"
 
