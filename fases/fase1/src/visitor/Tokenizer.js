@@ -56,8 +56,7 @@ end module tokenizer
 
     visitSpacesTabs(node){
         return `
-        
-        ! whitespace
+        ! whitespace ${node.value}
         else if (input(i:i) == ' ' .or. input(i:i) <= char(9) .or. input(i:i) == char(10)) then
             if (is_int) then
                 input = input(i:)
@@ -77,6 +76,6 @@ end module tokenizer
             if (input(i:i) == char(9)) lexval = lexval // '\t'
             if (input(i:i) == char(10)) lexval = lexval // '\n'
     
-        `
+        `;
     }
 }

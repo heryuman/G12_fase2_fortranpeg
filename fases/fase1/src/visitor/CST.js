@@ -76,6 +76,17 @@ export class Corchete extends Node {
     }
 }
     
+export class SpacesTabs extends Node {
+    constructor(value) {
+        super();
+        this.value = value;
+    }
+
+    accept(visitor) {
+        return visitor.visitSpacesTabs(this);
+    }
+}
+    
 export class Rango extends Node {
     constructor(bottom, top) {
         super();

@@ -90,6 +90,31 @@ end module tokenizer
     visitFin(node) {
         return '';
     }
+
+    visitSpacesTabs(node){
+        return `
+        ! whitespace ${node.value}
+        else if (input(i:i) == ' ' .or. input(i:i) <= char(9) .or. input(i:i) == char(10)) then
+            if (is_int) then
+                input = input(i:)
+                lexval = lexval // ' - integer'
+                return
+            else if (is_str) then
+                input = input(i:)
+                lexval = lexval // ' - string'
+                return
+            else if (is_space) then
+                input = input(i:)
+                lexval = lexval // ' - whitespace'
+                return
+            end if
+            is_space = .true.
+            if (input(i:i) == ' ') lexval = lexval // '_'
+            if (input(i:i) == char(9)) lexval = lexval // '\t'
+            if (input(i:i) == char(10)) lexval = lexval // '\n'
+    
+        `;
+    }
 }
 
 export function generateCaracteres(chars) {
