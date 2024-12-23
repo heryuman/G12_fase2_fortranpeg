@@ -1,12 +1,28 @@
 import Visitor from '../visitor/Visitor.js';
 import { Rango } from '../visitor/CST.js';
+// tokenizer
 export default class Tokenizer extends Visitor {
     generateTokenizer(grammar) {
         return `
-module tokenizer
+module parser
 implicit none
 
 contains
+
+subroutine parse(input)
+    character(len=*), intent(in) :: input
+    character(len=20) :: lexeme
+    integer :: cursor
+
+    cursor = 1
+    lexeme = " "
+
+    do while (lexeme /= "EOF" .and. lexeme /= "ERROR")
+        lexeme = nextSym(input, cursor)
+        print *, "Lexeme: ", lexeme
+    end do
+end subroutine parse
+
 function nextSym(input, cursor) result(lexeme)
     character(len=*), intent(in) :: input
     integer, intent(inout) :: cursor
@@ -24,7 +40,7 @@ function nextSym(input, cursor) result(lexeme)
     print *, "error lexico en col ", cursor, ', "'//input(cursor:cursor)//'"'
     lexeme = "ERROR"
 end function nextSym
-end module tokenizer 
+end module parser 
         `;
     }
 
