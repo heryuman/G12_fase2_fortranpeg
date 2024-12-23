@@ -290,6 +290,8 @@ function peg$parse(input, options) {
     return new n.Union([expr, ...rest]);
 };
   var peg$f4 = function(prefix, label, operator, expr, qty) {
+    console.log("tipod e dato: "+typeof expr)
+    
     return new n.Expresion(expr,prefix,label, operator, qty);
 };
   var peg$f5 = function(id) { usos.push(id)
@@ -297,7 +299,27 @@ function peg$parse(input, options) {
                 };
   var peg$f6 = function(val, isCase) {return new n.String(val.replace(/['"]/g, ''), isCase);};
   var peg$f7 = function(chars, isCase) {
-                    console.log("chars--->> ",chars.flat());
+                    //console.log("chars--->> ",chars.flat());
+                    let arreglo = chars[0]
+                    /*for (let i = 0; i < arreglo.length; i++) {
+                        console.log("elemento:"+ arreglo[i]);
+                        
+                    }*/
+                    let cadena = arreglo.join("") 
+                    console.log("cadena:"+cadena);
+                    
+                    let encontroSpace = false
+                    if (cadena.includes("\\t")||cadena.includes("\\n")||cadena.includes("\\r")){
+
+                        if(cadena.includes(" ")){
+                            return new n.SpacesTabs(cadena);
+                        }    
+                        
+                    }
+
+                    //console.log(encontroTab);
+                    
+
                     return new n.Corchete(chars.flat(), isCase)};
   var peg$f8 = function() {return new n.Punto();};
   var peg$f9 = function() {return new n.Fin();};

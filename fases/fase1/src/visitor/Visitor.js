@@ -7,6 +7,7 @@ export default class Visitor {
 	visitExpresion(node) {}
 	visitString(node) {}
 	visitCorchete(node) {}
+	visitSpacesTabs(node) {}
 	visitRango(node) {}
 	visitIdentificador(node) {}
 	visitPunto(node) {}
