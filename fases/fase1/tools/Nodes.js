@@ -2,11 +2,13 @@ const nodes = {
     Producciones: ['id', 'expr', 'alias'],
     Opciones: ['exprs'],
     Union: ['exprs'],
-    Expresion: ['expr', 'label', 'qty'],
+    //Expresion: ['expr', 'label', 'qty'],
+    Expresion: ['expr', 'prefix', 'label', 'operator', 'qty'],
     String: ['val', 'isCase'],
-    Clase:['chars', 'isCase'],
+    Corchete: ['chars', 'isCase'],
     Rango: ['bottom', 'top'],
-    Etiqueta:['id',"dp","varios","arroba"],
+
+    // seguir
 };
 
 export default nodes;

@@ -42,11 +42,11 @@ const analizar = () => {
 
         if(errores.length > 0){
             salida.setValue(
-                `Error~~~: ${errores[0].message} xxxx`
+                `Error: ${errores[0].message}`
             );
             return
         }else{
-            salida.setValue("AAnálisis Exitoso");
+            salida.setValue("Análisis Exitoso");
         }
 
         // salida.setValue("Análisis Exitoso");
@@ -66,7 +66,7 @@ const analizar = () => {
         if(e.location === undefined){
             
             salida.setValue(
-                `Error: ${e.message} -->`
+                `Error: ${e.message}`
             );
 
         }else {
@@ -75,7 +75,7 @@ const analizar = () => {
 
             // Mostrar mensaje de error en el editor de salida
             salida.setValue(
-                `Errrrrror: ${e.message}\nEn línea ${e.location.start.line} columna ${e.location.start.column}`
+                `Error: ${e.message}\nEn línea ${e.location.start.line} columna ${e.location.start.column}`
             );
 
             // Resaltar el error en el editor de entrada
