@@ -40,6 +40,8 @@ union = expr:expresion rest:(_ @expresion !(_ literales? _ "=") )* {
 }
 
 expresion = prefix:("@")? _ label:$(identificador _ ":")?_ operator:varios? _ expr:expresiones _ qty:$([?+*]/conteo)? {
+    console.log("tipod e dato: "+typeof expr)
+    
     return new n.Expresion(expr,prefix,label, operator, qty);
 }
 
@@ -49,7 +51,27 @@ expresiones  =  id:identificador { usos.push(id) }
                 / val:$literales isCase:"i"?  {return new n.String(val.replace(/['"]/g, ''), isCase);}
                 / "(" _ opciones _ ")"
                 / chars:corchetes isCase:"i"? {
-                    console.log("chars--->> ",chars.flat());
+                    //console.log("chars--->> ",chars.flat());
+                    let arreglo = chars[0]
+                    /*for (let i = 0; i < arreglo.length; i++) {
+                        console.log("elemento:"+ arreglo[i]);
+                        
+                    }*/
+                    let cadena = arreglo.join("") 
+                    console.log("cadena:"+cadena);
+                    
+                    let encontroSpace = false
+                    if (cadena.includes("\\t")||cadena.includes("\\n")||cadena.includes("\\r")){
+
+                        if(cadena.includes(" ")){
+                            return new n.SpacesTabs(cadena);
+                        }    
+                        
+                    }
+
+                    //console.log(encontroTab);
+                    
+
                     return new n.Corchete(chars.flat(), isCase)}
                 / "."
                 / "!."
