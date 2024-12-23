@@ -294,16 +294,25 @@ function peg$parse(input, options) {
 };
   var peg$f5 = function(id) { usos.push(id) };
   var peg$f6 = function(val, isCase) {return new n.String(val.replace(/['"]/g, ''), isCase);};
-  var peg$f7 = function(chars, isCase) {return new n.Corchete(chars, isCase)};
+  var peg$f7 = function(chars, isCase) {
+                    console.log("chars--->> ",chars.flat());
+                    return new n.Corchete(chars.flat(), isCase)};
   var peg$f8 = function(contenido) {
-        return `Entrada válida: [${input}]`;
-    };
+        //console.log("corchetes--->> ",contenido);
+       console.log(`Entrada válida: ${contenido}`);
+        //return `Entrada válida: [${input}]`;
+      // return new n.Corchete(contenido);
+     return contenido;
+     
+     //return contenido;
+   };
   var peg$f9 = function(inicio, fin) {
         if (inicio.charCodeAt(0) > fin.charCodeAt(0)) {
             throw new Error(`Rango inválido: [${inicio}-${fin}]`);
 
         }
-        return `${inicio}-${fin}`;
+        //return `${inicio}-${fin}`;
+        return new n.Rango(inicio, fin);
     };
   var peg$f10 = function() { return text()};
   var peg$f11 = function() {return new n.Numero()};
@@ -1179,7 +1188,7 @@ function peg$parse(input, options) {
   }
 
   function peg$parsecorchetes() {
-    var s0, s1, s2, s3;
+    var s0, s1, s2, s3, s4;
 
     s0 = peg$currPos;
     if (input.charCodeAt(peg$currPos) === 91) {
@@ -1191,16 +1200,44 @@ function peg$parse(input, options) {
     }
     if (s1 !== peg$FAILED) {
       s2 = [];
-      s3 = peg$parserango();
+      s3 = peg$currPos;
+      s4 = peg$parserango();
+      if (s4 !== peg$FAILED) {
+        s3 = s4;
+      } else {
+        peg$currPos = s3;
+        s3 = peg$FAILED;
+      }
       if (s3 === peg$FAILED) {
-        s3 = peg$parsetexto();
+        s3 = peg$currPos;
+        s4 = peg$parsetexto();
+        if (s4 !== peg$FAILED) {
+          s3 = s4;
+        } else {
+          peg$currPos = s3;
+          s3 = peg$FAILED;
+        }
       }
       if (s3 !== peg$FAILED) {
         while (s3 !== peg$FAILED) {
           s2.push(s3);
-          s3 = peg$parserango();
+          s3 = peg$currPos;
+          s4 = peg$parserango();
+          if (s4 !== peg$FAILED) {
+            s3 = s4;
+          } else {
+            peg$currPos = s3;
+            s3 = peg$FAILED;
+          }
           if (s3 === peg$FAILED) {
-            s3 = peg$parsetexto();
+            s3 = peg$currPos;
+            s4 = peg$parsetexto();
+            if (s4 !== peg$FAILED) {
+              s3 = s4;
+            } else {
+              peg$currPos = s3;
+              s3 = peg$FAILED;
+            }
           }
         }
       } else {
