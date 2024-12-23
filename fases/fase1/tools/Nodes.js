@@ -8,7 +8,9 @@ const nodes = {
     Corchete: ['chars', 'isCase'],
     SpacesTabs:['value'],
     Rango: ['bottom', 'top'],
-
+    Identificador: ['string'],
+    Punto: [],
+    Fin: [],
     // seguir
 };
 

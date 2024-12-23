@@ -9,4 +9,7 @@ export default class Visitor {
 	visitCorchete(node) {}
 	visitSpacesTabs(node) {}
 	visitRango(node) {}
+	visitIdentificador(node) {}
+	visitPunto(node) {}
+	visitFin(node) {}
 }
