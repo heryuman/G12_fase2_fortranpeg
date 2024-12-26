@@ -106,7 +106,7 @@ contenido
 
 corchete
     = "[" contenido "]"
-
+//
 texto
     = "\\" escape
     /[^\[\]]
